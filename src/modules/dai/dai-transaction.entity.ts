@@ -5,7 +5,7 @@ export class DaiTransaction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'block_number' })
   blockNumber: number;
 
   @Column()
@@ -20,6 +20,6 @@ export class DaiTransaction {
   @Column()
   value: string;
 
-  @Column()
+  @Column({ name: 'tx_hash' })
   txHash: string;
 }

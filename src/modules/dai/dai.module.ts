@@ -7,9 +7,9 @@ import { DaiListenerService } from './dai-listener.service';
 import { DaiTransaction } from './dai-transaction.entity';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { ApiKeyMiddleware } from '../../app.middleware';
 import { MiddlewareConsumer } from '@nestjs/common';
 import { NestModule } from '@nestjs/common';
+import { ApiKeyMiddleware } from '../../middlewares/api-key.middleware';
 
 @Module({
   imports: [

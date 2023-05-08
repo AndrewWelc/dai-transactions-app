@@ -1,11 +1,14 @@
+import { ApiRequestLog } from './entities/api-request-log.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DaiModule } from './modules/dai/dai.module';
-import { DataSource } from 'typeorm';
+import { Connection } from 'typeorm';
 import { DaiTransaction } from './modules/dai/dai-transaction.entity';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { MiddlewareConsumer } from '@nestjs/common';
+import { ApiRequestLoggerMiddleware } from './middlewares/api-request-logger.middleware';
 
 @Module({
   imports: [
@@ -19,7 +22,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [DaiTransaction],
+      entities: [DaiTransaction, ApiRequestLog],
       migrations: ['src/migrations/*{.ts,.js}'],
       synchronize: true,
       autoLoadEntities: true,
@@ -39,5 +42,9 @@ import { ThrottlerModule } from '@nestjs/throttler';
   providers: [],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) {}
+  constructor(private connection: Connection) {}
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(ApiRequestLoggerMiddleware).forRoutes('*');
+  }
 }
