@@ -38,12 +38,27 @@ const updateUserRole = async () => {
 updateUserRole();
 ```
 
+# Practical - DAI Transaction API 
+This is an application/API that interacts with the DAI smart contract and stores the latest DAI transactions into a database on a continuous basis. The application also exposes a REST API that provides access to data from the database, including the last DAI transactions, transactions by sender or recipient, and the DAI balance of a given address.
+
+## Tech Stack
+- NestJS
+- PostgreSQL
+- TypeORM
+- Jest
+- Winston for logging
+  
+All written in TypeScript.
 
 ## Environment Variables
 
 See the `.example.env` file to get the idea what the example environment variables are.
 
 **Important note: `INFURA_API_KEY` in `.env.example` is a free-tier [Infura](https://www.infura.io/) API KEY, but for the sake of this App, requests limits are more than enough.**
+
+## Logging
+
+The application logs all requests to the console. Additionally, the application logs errors to the console and to a log file in the logs directory.
 
 ## Installation
 
@@ -122,7 +137,10 @@ $ yarn run test:cov
 
 All the API reference can be also found in Swagger: http://localhost:3001/api - it has Authorization and all the parameters / query params included.
 
-## (Bonus) SQL queries
+## Additional information
+APP has Request logger middleware, that saves all the requests in the Postgres database - `api_request_log` table. ABI for the DAI contract is included in `abi` folder (`Dai.json`).
+
+# (Bonus) SQL queries
  
 ```sql
 /* AVG Requests per day */
