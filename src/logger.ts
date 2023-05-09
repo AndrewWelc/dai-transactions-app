@@ -6,8 +6,5 @@ export const logger = createLogger({
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.json(),
   ),
-  transports: [
-    new transports.Console(),
-    new transports.File({ filename: 'logs/app.log' }),
-  ],
+  transports: [new transports.File({ filename: 'logs/app.log' })],
 });
