@@ -83,6 +83,45 @@ $ yarn run test
 $ yarn run test:cov
 ```
 
+## API Reference
+#### Get DAI transactions
+
+```http
+  GET /dai/transactions
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `x-api-key` | `header` | **Required**. API Key to authorize the API |
+| `limit` | `number (query)` | Number of transaction per page |
+| `page` | `number (query)` | Page number |
+
+#### Get transactions by wallet address for recipient or sender
+
+```http
+  GET /dai/transactions/${walletAddress}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `walletAddress`      | `string` | **Required**. Wallet address |
+| `type`      | `string` | **Required**. Type of transactions to fetch (for recipient or sender) |
+| `limit` | `number (query)` | Number of transaction per page |
+| `page` | `number (query)` | Page number |
+
+#### Get balance of wallet address
+
+```http
+  GET /dai/${walletAddress}/balance
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `walletAddress`      | `string` | **Required**. Wallet address |
+
+
+All the API reference can be also found in Swagger: http://localhost:3001/api - it has Authorization and all the parameters / query params included.
+
 ## (Bonus) SQL queries
  
 ```sql
