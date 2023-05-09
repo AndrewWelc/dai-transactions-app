@@ -1,4 +1,4 @@
-import { dataSourceOptons } from './db/data-source';
+import { dataSourceOptions } from './db/data-source';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -13,7 +13,7 @@ import { ApiRequestLoggerMiddleware } from './middlewares/api-request-logger.mid
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot(dataSourceOptons),
+    TypeOrmModule.forRoot(dataSourceOptions),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],

@@ -72,6 +72,11 @@ export class DaiService {
       )
       .orderBy('transaction.id', 'DESC');
 
+    const count = await queryBuilder.getCount();
+    if (count === 0) {
+      throw new NotFoundException(`Wallet address not found`);
+    }
+
     if (type) {
       switch (type) {
         case TransactionType.RECIPIENT:
