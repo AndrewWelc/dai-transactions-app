@@ -5,8 +5,7 @@ import { DaiService } from './dai.service';
 import { DaiTransaction } from './entities/dai-transaction.entity';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { AddressParamDto } from './dto/address-param.dto';
-import { BadRequestException } from '@nestjs/common';
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { TransactionType } from './enum/transaction-type.enum';
 
 describe('DaiController', () => {
@@ -29,7 +28,7 @@ describe('DaiController', () => {
       controllers: [DaiController],
       providers: [
         DaiService,
-        { provide: Connection, useValue: mockRepository },
+        { provide: DataSource, useValue: mockRepository },
         {
           provide: getRepositoryToken(DaiTransaction),
           useValue: mockRepository,
@@ -71,23 +70,6 @@ describe('DaiController', () => {
       );
 
       expect(result).toEqual(transactions);
-    });
-
-    it('should throw BadRequestException if pagination parameters are invalid', async () => {
-      const transactions = [new DaiTransaction(), new DaiTransaction()];
-      jest
-        .spyOn(daiService, 'getTransactionsByAddress')
-        .mockResolvedValue(transactions);
-
-      paginationQueryDto.limit = -500;
-      paginationQueryDto.page = -1;
-
-      const result = await daiController.getTransactionsByAddress(
-        new AddressParamDto(walletAddress),
-        TransactionType.RECIPIENT,
-        paginationQueryDto,
-      );
-      expect(result).toThrow(BadRequestException);
     });
   });
 

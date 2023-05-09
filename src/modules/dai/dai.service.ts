@@ -1,4 +1,4 @@
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import {
   BadRequestException,
   Injectable,
@@ -9,6 +9,7 @@ import { ethers } from 'ethers';
 import { DaiTransaction } from './entities/dai-transaction.entity';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { TransactionType } from './enum/transaction-type.enum';
+import * as daiABI from '../../abi/Dai.json';
 
 @Injectable()
 export class DaiService {
@@ -16,23 +17,16 @@ export class DaiService {
   private readonly provider: ethers.providers.JsonRpcProvider;
   private readonly contract: ethers.Contract;
 
-  constructor(private readonly connection: Connection) {
-    const infuraApiKey = '7d6453101f94465293482597a759a456';
-    const infuraNetwork = 'mainnet'; // or mainnet, kovan, etc.
+  constructor(private readonly dataSource: DataSource) {
+    const infuraApiKey = process.env.INFURA_API_KEY;
+    const infuraNetwork = process.env.INFURA_NETWORK; // or mainnet, kovan, etc.
     this.provider = new ethers.providers.InfuraProvider(
       infuraNetwork,
       infuraApiKey,
     );
     this.contract = new ethers.Contract(
       '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-      [
-        'function name() public view returns (string)',
-        'function symbol() public view returns (string)',
-        'function decimals() public view returns (uint8)',
-        'function totalSupply() public view returns (uint256)',
-        'function balanceOf(address account) public view returns (uint256)',
-        'event Transfer(address indexed from, address indexed to, uint256 value)',
-      ],
+      daiABI,
       this.provider,
     );
   }
@@ -54,7 +48,7 @@ export class DaiService {
   ): Promise<DaiTransaction[]> {
     const { page, limit } = paginationQueryDto;
     const offset = (page - 1) * limit;
-    const transactions = await this.connection
+    const transactions = await this.dataSource
       .getRepository(DaiTransaction)
       .createQueryBuilder()
       .orderBy('id', 'DESC')
@@ -69,7 +63,7 @@ export class DaiService {
     paginationQueryDto: PaginationQueryDto,
     type?: TransactionType,
   ): Promise<DaiTransaction[]> {
-    const queryBuilder = this.connection
+    const queryBuilder = this.dataSource
       .getRepository(DaiTransaction)
       .createQueryBuilder('transaction')
       .where(
@@ -110,7 +104,7 @@ export class DaiService {
   }
 
   async getBalance(walletAddress: string): Promise<number> {
-    const queryBuilder = this.connection
+    const queryBuilder = this.dataSource
       .getRepository(DaiTransaction)
       .createQueryBuilder('transaction')
       .where(

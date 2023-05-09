@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ethers } from 'ethers';
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { DaiTransaction } from './entities/dai-transaction.entity';
 import { DaiService } from './dai.service';
 import * as daiABI from '../../abi/Dai.json';
@@ -12,7 +12,7 @@ export class DaiListenerService {
   private readonly contract: ethers.Contract;
 
   constructor(
-    private readonly connection: Connection,
+    private readonly dataSource: DataSource,
     private readonly daiService: DaiService,
   ) {
     const infuraApiKey = '7d6453101f94465293482597a759a456';
@@ -42,7 +42,7 @@ export class DaiListenerService {
       ) => {
         if (event.address !== daiAddress) {
           this.logger.warn(
-            `[transfer listener] transfer not within dai contract: ${event.address}, dai contract: ${daiAddress}`,
+            `[Transfer listener] transfer not within dai contract: ${event.address}, dai contract: ${daiAddress}`,
           );
           return;
         }
@@ -60,8 +60,10 @@ export class DaiListenerService {
           ),
           txHash: event.transactionHash,
         };
-        this.logger.log(`[transaction] ${JSON.stringify(transaction)}`);
-        await this.connection.getRepository(DaiTransaction).save(transaction);
+        this.logger.log(
+          `[Transfer - transaction] ${JSON.stringify(transaction)}`,
+        );
+        await this.dataSource.getRepository(DaiTransaction).save(transaction);
       },
     );
   }
