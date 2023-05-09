@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ethers } from 'ethers';
 import { Connection } from 'typeorm';
-import { DaiTransaction } from './dai-transaction.entity';
+import { DaiTransaction } from './entities/dai-transaction.entity';
 import { DaiService } from './dai.service';
 import * as daiABI from '../../abi/Dai.json';
 

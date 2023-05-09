@@ -1,93 +1,108 @@
-import { PaginationQueryDto } from './dto/pagination-query.dto';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { DaiController } from './dai.controller';
 import { DaiService } from './dai.service';
-import { Test } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { DaiTransaction } from './entities/dai-transaction.entity';
+import { PaginationQueryDto } from './dto/pagination-query.dto';
+import { AddressParamDto } from './dto/address-param.dto';
+import { BadRequestException } from '@nestjs/common';
+import { Connection } from 'typeorm';
 import { TransactionType } from './enum/transaction-type.enum';
-import { DaiTransaction } from './dai-transaction.entity';
-import { Repository } from 'typeorm';
 
-describe('DaiService', () => {
-  let daiService: DaiService;
+describe('DaiController', () => {
   let daiController: DaiController;
-  let repo: Repository<DaiTransaction>;
+  let daiService: DaiService;
+
+  const mockRepository = {
+    createQueryBuilder: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    offset: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    skip: jest.fn().mockReturnThis(),
+    take: jest.fn().mockReturnThis(),
+    getMany: jest.fn(),
+  };
 
   beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      controllers: [DaiController],
       providers: [
         DaiService,
+        { provide: Connection, useValue: mockRepository },
         {
           provide: getRepositoryToken(DaiTransaction),
-          useClass: Repository,
+          useValue: mockRepository,
         },
       ],
-      controllers: [DaiController],
     }).compile();
 
-    daiService = moduleRef.get<DaiService>(DaiService);
     daiController = moduleRef.get<DaiController>(DaiController);
-    repo = moduleRef.get<Repository<DaiTransaction>>(
-      getRepositoryToken(DaiTransaction),
-    );
+    daiService = moduleRef.get<DaiService>(DaiService);
   });
 
   describe('getTransactions', () => {
-    it('should return an array of transactions', async () => {
-      const paginationQueryDto = new PaginationQueryDto();
-      jest.spyOn(daiService, 'getTransactions').mockResolvedValueOnce([]);
-      const result = await daiController.getTransactions(paginationQueryDto);
-      expect(result).toEqual([]);
+    it('should return an array of DaiTransactions', async () => {
+      const transactions = [new DaiTransaction(), new DaiTransaction()];
+      jest.spyOn(daiService, 'getTransactions').mockResolvedValue(transactions);
+
+      const result = await daiController.getTransactions(
+        new PaginationQueryDto(),
+      );
+
+      expect(result).toEqual(transactions);
     });
   });
 
   describe('getTransactionsByAddress', () => {
-    it('should return an array of transactions for the specified wallet address', async () => {
-      const addressParamDto = { walletAddress: '0x123' };
-      const paginationQueryDto = new PaginationQueryDto();
-      const transactionType = TransactionType.SENDER;
+    const walletAddress = '0x123';
+    const paginationQueryDto = new PaginationQueryDto();
+
+    it('should return transactions for wallet address', async () => {
+      const transactions = [new DaiTransaction(), new DaiTransaction()];
       jest
         .spyOn(daiService, 'getTransactionsByAddress')
-        .mockResolvedValueOnce([]);
+        .mockResolvedValue(transactions);
+
       const result = await daiController.getTransactionsByAddress(
-        addressParamDto,
-        transactionType,
+        new AddressParamDto(walletAddress),
+        TransactionType.RECIPIENT,
         paginationQueryDto,
       );
-      expect(result).toEqual([]);
+
+      expect(result).toEqual(transactions);
     });
 
-    it('should throw NotFoundException when address does not exist', async () => {
-      const addressParamDto = { walletAddress: '0x456' };
-      const paginationQueryDto = new PaginationQueryDto();
-      const transactionType = TransactionType.SENDER;
+    it('should throw BadRequestException if pagination parameters are invalid', async () => {
+      const transactions = [new DaiTransaction(), new DaiTransaction()];
       jest
         .spyOn(daiService, 'getTransactionsByAddress')
-        .mockResolvedValueOnce(null);
-      expect(async () => {
-        await daiController.getTransactionsByAddress(
-          addressParamDto,
-          transactionType,
-          paginationQueryDto,
-        );
-      }).rejects.toThrow(NotFoundException);
+        .mockResolvedValue(transactions);
+
+      paginationQueryDto.limit = -500;
+      paginationQueryDto.page = -1;
+
+      const result = await daiController.getTransactionsByAddress(
+        new AddressParamDto(walletAddress),
+        TransactionType.RECIPIENT,
+        paginationQueryDto,
+      );
+      expect(result).toThrow(BadRequestException);
     });
   });
 
   describe('getBalance', () => {
-    it('should return the balance for the specified wallet address', async () => {
-      const addressParamDto = { walletAddress: '0x123' };
-      jest.spyOn(daiService, 'getBalance').mockResolvedValueOnce(100);
-      const result = await daiController.getBalance(addressParamDto);
-      expect(result).toEqual(100);
-    });
+    const walletAddress = '0x123';
+    const balance = 123.45;
 
-    it('should throw NotFoundException when address does not exist', async () => {
-      const addressParamDto = { walletAddress: '0x456' };
-      jest.spyOn(daiService, 'getBalance').mockResolvedValueOnce(null);
-      expect(async () => {
-        await daiController.getBalance(addressParamDto);
-      }).rejects.toThrow(NotFoundException);
+    it('should return the balance of the wallet address', async () => {
+      jest.spyOn(daiService, 'getBalance').mockResolvedValue(balance);
+
+      const result = await daiController.getBalance(
+        new AddressParamDto(walletAddress),
+      );
+
+      expect(result).toBe(balance);
     });
   });
 });

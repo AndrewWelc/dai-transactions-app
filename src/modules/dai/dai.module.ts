@@ -4,7 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { DaiService } from './dai.service';
 import { DaiController } from './dai.controller';
 import { DaiListenerService } from './dai-listener.service';
-import { DaiTransaction } from './dai-transaction.entity';
+import { DaiTransaction } from './entities/dai-transaction.entity';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { MiddlewareConsumer } from '@nestjs/common';

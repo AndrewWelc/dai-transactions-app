@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query, ValidationPipe } from '@nestjs/common';
 import { DaiService } from './dai.service';
-import { DaiTransaction } from './dai-transaction.entity';
+import { DaiTransaction } from './entities/dai-transaction.entity';
 import { ApiParam, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { AddressParamDto } from './dto/address-param.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';

@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { ApiRequestLog } from '../entities/api-request-log.entity';
+import { ApiRequestLog } from '../modules/dai/entities/api-request-log.entity';
 import { Connection } from 'typeorm';
 
 @Injectable()

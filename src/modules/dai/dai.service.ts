@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ethers } from 'ethers';
-import { DaiTransaction } from './dai-transaction.entity';
+import { DaiTransaction } from './entities/dai-transaction.entity';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { TransactionType } from './enum/transaction-type.enum';
 
