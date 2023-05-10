@@ -140,6 +140,9 @@ All the API reference can be also found in Swagger: http://localhost:3001/api - 
 ## Additional information
 APP has Request logger middleware, that saves all the requests in the Postgres database - `api_request_log` table. ABI for the DAI contract is included in `abi` folder (`Dai.json`).
 
+## High-Level Description
+High-level description of the technologies used and development decisions are available in the [HIGH-LEVEL-DESC](./HIGH-LEVEL-DESC.md) file.
+
 # (Bonus) SQL queries
  
 ```sql
