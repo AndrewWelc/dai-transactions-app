@@ -10,19 +10,21 @@ export class DaiListenerService {
   private readonly logger = new Logger(DaiListenerService.name);
   private readonly provider: ethers.providers.JsonRpcProvider;
   private readonly contract: ethers.Contract;
+  private readonly daiContractAddress: string;
 
   constructor(
     private readonly dataSource: DataSource,
     private readonly daiService: DaiService,
   ) {
-    const infuraApiKey = '7d6453101f94465293482597a759a456';
-    const infuraNetwork = 'mainnet';
+    const infuraApiKey = process.env.INFURA_API_KEY;
+    const infuraNetwork = process.env.INFURA_NETWORK;
+    this.daiContractAddress = process.env.DAI_CONTRACT_ADDRESS;
     this.provider = new ethers.providers.InfuraProvider(
       infuraNetwork,
       infuraApiKey,
     );
     this.contract = new ethers.Contract(
-      '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+      this.daiContractAddress,
       daiABI,
       this.provider,
     );
@@ -30,8 +32,6 @@ export class DaiListenerService {
   }
 
   private async listen() {
-    const daiAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F';
-
     this.contract.on(
       'Transfer',
       async (
@@ -40,9 +40,9 @@ export class DaiListenerService {
         value: ethers.BigNumber,
         event: ethers.Event,
       ) => {
-        if (event.address !== daiAddress) {
+        if (event.address !== this.daiContractAddress) {
           this.logger.warn(
-            `[Transfer listener] transfer not within dai contract: ${event.address}, dai contract: ${daiAddress}`,
+            `[Transfer listener] transfer not within dai contract: ${event.address}, dai contract: ${this.daiContractAddress}`,
           );
           return;
         }

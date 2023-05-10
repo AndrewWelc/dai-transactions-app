@@ -25,7 +25,7 @@ export class DaiService {
       infuraApiKey,
     );
     this.contract = new ethers.Contract(
-      '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+      process.env.DAI_CONTRACT_ADDRESS,
       daiABI,
       this.provider,
     );
