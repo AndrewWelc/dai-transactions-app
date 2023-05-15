@@ -6,39 +6,11 @@ This project includes the full coding challenge with the basic and practical cod
 
 ## Repository includes
 
-- Basic code improvement part
 - DAI Transaction APP with all the required details to run it locally
-- SQL queries as a bonus task
+- SQL queries as a bonus
 
-## Basic - improved code
-I've assumed that `connectToDatabase()` establishes the database connection, then we're getting the user from the database as well as the settings for the specific user. Then we set the role for the user and notifer user and admins about the updated role.
 
-In improved version I've used the async/await syntax to simplify the nested Promise chain.
-
-Also, note that the `notifyUser()` and `notifyAdmins()` methods are independent and do not depend on each other, so we can execute them concurrently using `Promise.all()`. This allows to notify the user and the admins at the same time, which can improve the overall performance of this functionality.
-
-Finally, I've added basic error handling using a `try/catch`.
-```ts
-const updateUserRole = async () => {
-  try {
-    const database = await connectToDatabase();
-    const user = await getUser(database, 'email@email.com');
-    const settings = await getUserSettings(database, user.id);
-    const success = await setRole(database, user.id, "ADMIN");
-    await Promise.all([
-      notifyUser(user.id, "USER_ROLE_UPDATED"),
-      notifyAdmins("USER_ROLE_UPDATED")
-    ]);
-    return success;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-updateUserRole();
-```
-
-# Practical - DAI Transaction API 
+# DAI Transaction API 
 This is an application/API that interacts with the DAI smart contract and stores the latest DAI transactions into a database on a continuous basis. The application also exposes a REST API that provides access to data from the database, including the last DAI transactions, transactions by sender or recipient, and the DAI balance of a given address.
 
 ## Tech Stack
